@@ -127,6 +127,7 @@ resource "aws_nat_gateway" "nat_NY" {
 resource "aws_route_table" "private_NY" {
   vpc_id = aws_vpc.VPC-B-NewYork-Test.id
   
+  /*
   route  {
       cidr_block                 = "10.19.0.0/16"
       nat_gateway_id             = ""
@@ -142,6 +143,7 @@ resource "aws_route_table" "private_NY" {
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
     }
+    */
 
 
   route  {
@@ -389,7 +391,7 @@ resource "aws_lb_listener" "http_NY" {
 }
 
 
-
+/*
 #-------------------------------------------------------------------#
 # ASG
 
@@ -469,7 +471,7 @@ resource "aws_autoscaling_attachment" "ASG01_NY_attachment" {
   autoscaling_group_name = aws_autoscaling_group.ASG01_NY.name
   alb_target_group_arn   = aws_lb_target_group.ASG01_NY_TG01.arn
 }
-
+*/
 
 
 
