@@ -12,6 +12,15 @@ terraform {
     }
   }
 }
+required_version = ">= 1.1.0"
+
+cloud {
+  organization = "statuc_devops"
+
+  workspaces {
+    name = "armageddon-github-actions"
+  }
+}
 
 
 # Default Region for AWS.
@@ -73,10 +82,3 @@ provider "aws" {
 # Added GitHub Actions to workflow.
 # 
 
-cloud {
-  organization = "statuc_devops"
-
-  workspaces {
-    name = "armageddon-github-actions"
-  }
-}
