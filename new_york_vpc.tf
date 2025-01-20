@@ -125,27 +125,7 @@ resource "aws_nat_gateway" "nat_NY" {
 # Routes
 
 resource "aws_route_table" "private_NY" {
-  vpc_id = aws_vpc.VPC-B-NewYork-Test.id
-  
-  /*
-  route  {
-      cidr_block                 = "10.19.0.0/16"
-      nat_gateway_id             = ""
-      carrier_gateway_id         = ""
-      destination_prefix_list_id = ""
-      egress_only_gateway_id     = ""
-      gateway_id                 = ""
-      # instance_id                = ""
-      ipv6_cidr_block            = ""
-      local_gateway_id           = ""
-      network_interface_id       = ""
-      transit_gateway_id         = aws_ec2_transit_gateway.VPC-B-NewYork-Test-TGW01.id
-      vpc_endpoint_id            = ""
-      vpc_peering_connection_id  = ""
-    }
-    */
-
-
+  vpc_id = aws_vpc.VPC-B-NewYork-Test.id  
   route  {
       cidr_block                 = "0.0.0.0/0"
       nat_gateway_id             = aws_nat_gateway.nat_NY.id
