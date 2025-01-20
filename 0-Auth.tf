@@ -14,6 +14,7 @@ terraform {
 }
 required_version = ">= 1.1.0"
 
+# Added GitHub Actions to workflow.
 cloud {
   organization = "statuc_devops"
 
@@ -79,6 +80,4 @@ provider "aws" {
     region = "us-west-1"
 }
 
-# Added GitHub Actions to workflow.
-# 
 
