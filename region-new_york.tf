@@ -479,3 +479,4 @@ resource "aws_autoscaling_attachment" "ASG01_NY_attachment" {
 
 
 
+
