@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "4.52.0"
       configuration_aliases = [ aws.alternate ]
     }
     random = {
@@ -12,17 +12,20 @@ terraform {
     }
   }
 }
-required_version = ">= 1.1.0"
+
 
 # Added GitHub Actions to workflow.
-cloud {
-  organization = "statuc_devops"
 
-  workspaces {
-    name = "armageddon-github-actions"
-  }
+terraform { 
+  cloud { 
+    
+    organization = "statuc_devops" 
+
+    workspaces { 
+      name = "armageddon-github-actions" 
+    } 
+  } 
 }
-
 
 # Default Region for AWS.
 provider "aws" {

@@ -325,7 +325,7 @@ resource "aws_security_group" "ASG01-SG03-NY-servers" {
     }
 }
 
-
+/*
 #----------------------------------------------#
 # Target Groups
 
@@ -389,7 +389,7 @@ resource "aws_lb_listener" "http_NY" {
     target_group_arn = aws_lb_target_group.ASG01_NY_TG01.arn
   }
 }
-
+*/
 
 /*
 #-------------------------------------------------------------------#
