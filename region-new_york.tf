@@ -391,7 +391,7 @@ resource "aws_lb_listener" "http_NY" {
 }
 
 
-
+/*
 #-------------------------------------------------------------------#
 # ASG
 
@@ -471,7 +471,7 @@ resource "aws_autoscaling_attachment" "ASG01_NY_attachment" {
   autoscaling_group_name = aws_autoscaling_group.ASG01_NY.name
   alb_target_group_arn   = aws_lb_target_group.ASG01_NY_TG01.arn
 }
-
+*/
 
 
 
