@@ -29,18 +29,18 @@ terraform {
 
 # Default Region for AWS.
 provider "aws" {
-    region = "us-east-1"
+    region = "us-east-2"
   
 }
 
-
+/*
 # Set default AWS provider in Tokyo.
 provider "aws" {
     alias = "tokyo"
     region = "ap-northeast-1"
 
 }
-
+*/
 
 # Add additional provier confifuration for each region.
 provider "aws" {
@@ -49,7 +49,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-
+/* Commented out the other regions to troubleshoot. 20 jan 2025.
 provider "aws" {
     alias = "london"
 
@@ -82,5 +82,5 @@ provider "aws" {
 
     region = "us-west-1"
 }
-
+*/ 
 
