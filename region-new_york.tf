@@ -2,15 +2,15 @@
 # VPC
 
 resource "aws_vpc" "VPC-B-NewYork-Test" {
-    provider = aws.newyork
-    cidr_block = "10.21.0.0/16"
-  
+  provider   = aws.newyork
+  cidr_block = "10.21.0.0/16"
+
 
   tags = {
-    Name = "VPC-B-NewYork-Test"
+    Name    = "VPC-B-NewYork-Test"
     Service = "application1"
-    Owner = "Frodo"
-    Planet = "Arda"
+    Owner   = "Frodo"
+    Planet  = "Arda"
   }
 }
 
@@ -24,7 +24,7 @@ resource "aws_subnet" "public-us-east-1a" {
   cidr_block              = "10.21.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  provider = aws.newyork
+  provider                = aws.newyork
 
   tags = {
     Name    = "public-us-east-1a"
@@ -39,7 +39,7 @@ resource "aws_subnet" "public-us-east-1b" {
   cidr_block              = "10.21.2.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
-  provider = aws.newyork
+  provider                = aws.newyork
 
   tags = {
     Name    = "public-us-east-1b"
@@ -55,7 +55,7 @@ resource "aws_subnet" "private-us-east-1a" {
   vpc_id            = aws_vpc.VPC-B-NewYork-Test.id
   cidr_block        = "10.21.11.0/24"
   availability_zone = "us-east-1a"
-  provider = aws.newyork
+  provider          = aws.newyork
 
   tags = {
     Name    = "private-us-east-1a"
@@ -69,7 +69,7 @@ resource "aws_subnet" "private-us-east-1b" {
   vpc_id            = aws_vpc.VPC-B-NewYork-Test.id
   cidr_block        = "10.21.12.0/24"
   availability_zone = "us-east-1b"
-  provider = aws.newyork
+  provider          = aws.newyork
 
   tags = {
     Name    = "private-us-east-1b"
@@ -98,7 +98,7 @@ resource "aws_internet_gateway" "igw_NY" {
 # NAT
 
 resource "aws_eip" "eip_NY" {
-  vpc = true
+  vpc      = true
   provider = aws.newyork
 
   tags = {
@@ -110,7 +110,7 @@ resource "aws_eip" "eip_NY" {
 resource "aws_nat_gateway" "nat_NY" {
   allocation_id = aws_eip.eip_NY.id
   subnet_id     = aws_subnet.public-us-east-1a.id
-  provider = aws.newyork
+  provider      = aws.newyork
 
   tags = {
     Name = "nat_NY"
@@ -126,7 +126,7 @@ resource "aws_nat_gateway" "nat_NY" {
 
 resource "aws_route_table" "private_NY" {
   vpc_id = aws_vpc.VPC-B-NewYork-Test.id
-  
+
   /*
   route  {
       cidr_block                 = "10.19.0.0/16"
@@ -146,21 +146,21 @@ resource "aws_route_table" "private_NY" {
     */
 
 
-  route  {
-      cidr_block                 = "0.0.0.0/0"
-      nat_gateway_id             = aws_nat_gateway.nat_NY.id
-      carrier_gateway_id         = ""
-      destination_prefix_list_id = ""
-      egress_only_gateway_id     = ""
-      gateway_id                 = ""
-      #instance_id                = ""
-      ipv6_cidr_block            = ""
-      local_gateway_id           = ""
-      network_interface_id       = ""
-      transit_gateway_id         = ""
-      vpc_endpoint_id            = ""
-      vpc_peering_connection_id  = ""
-    }
+  route {
+    cidr_block                 = "0.0.0.0/0"
+    nat_gateway_id             = aws_nat_gateway.nat_NY.id
+    carrier_gateway_id         = ""
+    destination_prefix_list_id = ""
+    egress_only_gateway_id     = ""
+    gateway_id                 = ""
+    #instance_id                = ""
+    ipv6_cidr_block           = ""
+    local_gateway_id          = ""
+    network_interface_id      = ""
+    transit_gateway_id        = ""
+    vpc_endpoint_id           = ""
+    vpc_peering_connection_id = ""
+  }
 
   tags = {
     Name = "private_NY"
@@ -171,22 +171,22 @@ resource "aws_route_table" "private_NY" {
 resource "aws_route_table" "public_NY" {
   vpc_id = aws_vpc.VPC-B-NewYork-Test.id
 
-  route   {
-      cidr_block                 = "0.0.0.0/0"
-      gateway_id                 = aws_internet_gateway.igw_NY.id
-      nat_gateway_id             = ""
-      carrier_gateway_id         = ""
-      destination_prefix_list_id = ""
-      egress_only_gateway_id     = ""
-      #instance_id                = ""
-      ipv6_cidr_block            = ""
-      local_gateway_id           = ""
-      network_interface_id       = ""
-      transit_gateway_id         = ""
-      vpc_endpoint_id            = ""
-      vpc_peering_connection_id  = ""
-    }
-    tags = {
+  route {
+    cidr_block                 = "0.0.0.0/0"
+    gateway_id                 = aws_internet_gateway.igw_NY.id
+    nat_gateway_id             = ""
+    carrier_gateway_id         = ""
+    destination_prefix_list_id = ""
+    egress_only_gateway_id     = ""
+    #instance_id                = ""
+    ipv6_cidr_block           = ""
+    local_gateway_id          = ""
+    network_interface_id      = ""
+    transit_gateway_id        = ""
+    vpc_endpoint_id           = ""
+    vpc_peering_connection_id = ""
+  }
+  tags = {
     Name = "public_NY"
   }
 }
@@ -227,102 +227,102 @@ resource "aws_route_table_association" "public-us-east-1b" {
 # Security group for Load Balancer
 
 resource "aws_security_group" "ASG01-SG01-NY-LB01" {
-    name = "ASG01-SG01-NY-LB01"
-    description = "Allow HTTP inbound traffic to Load Balancer."
-    vpc_id = aws_vpc.VPC-B-NewYork-Test.id
-    provider = aws.newyork
+  name        = "ASG01-SG01-NY-LB01"
+  description = "Allow HTTP inbound traffic to Load Balancer."
+  vpc_id      = aws_vpc.VPC-B-NewYork-Test.id
+  provider    = aws.newyork
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-   egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-    tags = {
-        Name = "ASG01-SG01-NY-LB01"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name    = "ASG01-SG01-NY-LB01"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security Group for Automatic Scaling Group
 resource "aws_security_group" "ASG01-SG02-NY-TG80" {
-    name = "ASG01-SG02-NY-TG80"
-    description = "allow traffic to ASG"
-    vpc_id = aws_vpc.VPC-B-NewYork-Test.id
-    provider = aws.newyork
+  name        = "ASG01-SG02-NY-TG80"
+  description = "allow traffic to ASG"
+  vpc_id      = aws_vpc.VPC-B-NewYork-Test.id
+  provider    = aws.newyork
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-      tags = {
-        Name = "ASG01-SG02-NY-TG80"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG02-NY-TG80"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security group for EC2 Virtual Machines
 resource "aws_security_group" "ASG01-SG03-NY-servers" {
-    name = "ASG01-SG03-NY-servers"
-    description = "Allow SSH and HTTP traffic to production servers"
-    vpc_id = aws_vpc.VPC-B-NewYork-Test.id
-    provider = aws.newyork
+  name        = "ASG01-SG03-NY-servers"
+  description = "Allow SSH and HTTP traffic to production servers"
+  vpc_id      = aws_vpc.VPC-B-NewYork-Test.id
+  provider    = aws.newyork
 
-    ingress {
-        description = "SSH"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-         cidr_blocks = ["10.0.0.0/8"]
-    }
-
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
-    tags = {
-        Name = "ASG01-SG03-NY-servers"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG03-NY-servers"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
@@ -330,12 +330,12 @@ resource "aws_security_group" "ASG01-SG03-NY-servers" {
 # Target Groups
 
 resource "aws_lb_target_group" "ASG01_NY_TG01" {
-  name     = "ASG01-NewYork-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.VPC-B-NewYork-Test.id
+  name        = "ASG01-NewYork-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.VPC-B-NewYork-Test.id
   target_type = "instance"
-  provider = aws.newyork
+  provider    = aws.newyork
 
   health_check {
     enabled             = true
@@ -364,12 +364,12 @@ resource "aws_lb" "ASG01-NY-LB01" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ASG01-SG01-NY-LB01.id]
-  subnets            = [
+  subnets = [
     aws_subnet.public-us-east-1a.id,
     aws_subnet.public-us-east-1b.id
   ]
   enable_deletion_protection = false
-#Lots of death and suffering here, make sure it's false
+  #Lots of death and suffering here, make sure it's false
 
   tags = {
     Name    = "ASG01-NY-LB01"
@@ -396,21 +396,21 @@ resource "aws_lb_listener" "http_NY" {
 # ASG
 
 resource "aws_autoscaling_group" "ASG01_NY" {
-  name_prefix           = "ASG01-NewYork-auto-scaling-group"
-  min_size              = 1
-  max_size              = 5
-  desired_capacity      = 2
-  vpc_zone_identifier   = [
+  name_prefix      = "ASG01-NewYork-auto-scaling-group"
+  min_size         = 1
+  max_size         = 5
+  desired_capacity = 2
+  vpc_zone_identifier = [
     aws_subnet.private-us-east-1a.id,
     aws_subnet.private-us-east-1b.id
   ]
 
   provider = aws.newyork
-  
-  health_check_type          = "ELB"
-  health_check_grace_period  = 300
-  force_delete               = true
-  target_group_arns          = [aws_lb_target_group.ASG01_NY_TG01.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
+  force_delete              = true
+  target_group_arns         = [aws_lb_target_group.ASG01_NY_TG01.arn]
 
   launch_template {
     id      = aws_launch_template.app1_NewYork_LT.id
@@ -430,10 +430,10 @@ resource "aws_autoscaling_group" "ASG01_NY" {
 
   # Instance protection for terminating
   initial_lifecycle_hook {
-    name                  = "scale-in-protection"
-    lifecycle_transition  = "autoscaling:EC2_INSTANCE_TERMINATING"
-    default_result        = "CONTINUE"
-    heartbeat_timeout     = 300
+    name                 = "scale-in-protection"
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 300
   }
 
   tag {
@@ -455,7 +455,7 @@ resource "aws_autoscaling_policy" "app1_NY_scaling_policy" {
   name                   = "app1-cpu-target"
   autoscaling_group_name = aws_autoscaling_group.ASG01_NY.name
 
-  policy_type = "TargetTrackingScaling"
+  policy_type               = "TargetTrackingScaling"
   estimated_instance_warmup = 120
 
   target_tracking_configuration {
