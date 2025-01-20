@@ -1,21 +1,21 @@
 # Terraform Setup
 terraform {
   required_providers {
-   /*
+    /*
     aws = {
       source  = "hashicorp/aws"
       version = "4.52.0"
       configuration_aliases = [ aws.alternate ]
     }
     */
-    
+
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "4.52.0"
     }
     random = {
-      source = "hashicorp/random"
-      version = "3.4.5"
+      source  = "hashicorp/random"
+      version = "3.6.3"
     }
   }
 }
@@ -23,19 +23,18 @@ terraform {
 
 # Added GitHub Actions to workflow.
 
-terraform { 
-  cloud { 
-    
-    organization = "statuc_devops" 
+terraform {
+  cloud {
 
-    workspaces { 
-      name = "armageddon-github-actions" 
-    } 
-  } 
+    organization = "statuc_devops"
+
+    workspaces {
+      name = "armageddon-github-actions"
+    }
+  }
 }
 
-# Default Region for AWS.
 provider "aws" {
-    region = "us-east-1"
+  region = "us-east-1"
   
 }
