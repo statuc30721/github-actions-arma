@@ -1,10 +1,17 @@
 # Terraform Setup
 terraform {
   required_providers {
+   /*
     aws = {
       source  = "hashicorp/aws"
       version = "4.52.0"
       configuration_aliases = [ aws.alternate ]
+    }
+    */
+    
+    aws = {
+      source = "hashicorp/aws"
+      version = "4.52.0"
     }
     random = {
       source = "hashicorp/random"
@@ -29,7 +36,7 @@ terraform {
 
 # Default Region for AWS.
 provider "aws" {
-    region = "us-east-2"
+    region = "us-east-1"
   
 }
 
@@ -42,6 +49,7 @@ provider "aws" {
 }
 */
 
+/* Commented out the other regions to troubleshoot. 20 jan 2025.
 # Add additional provier confifuration for each region.
 provider "aws" {
   alias = "newyork"
@@ -49,7 +57,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-/* Commented out the other regions to troubleshoot. 20 jan 2025.
+
 provider "aws" {
     alias = "london"
 
