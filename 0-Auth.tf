@@ -6,8 +6,13 @@ terraform {
       version = "~> 3.0"
       configuration_aliases = [ aws.alternate ]
     }
+    random = {
+      source = "hashicorp/random"
+      version = "3.4.5"
+    }
   }
 }
+
 
 # Default Region for AWS.
 provider "aws" {
@@ -63,4 +68,15 @@ provider "aws" {
     alias = "california"
 
     region = "us-west-1"
+}
+
+# Added GitHub Actions to workflow.
+# 
+
+cloud {
+  organization = "statuc_devops"
+
+  workspaces {
+    name = "armageddon-github-actions"
+  }
 }
