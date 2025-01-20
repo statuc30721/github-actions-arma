@@ -25,7 +25,7 @@ terraform {
   cloud {
 
     organization = "statuc_devops"
-    
+
 
     workspaces {
       name = "armageddon-github-actions"
