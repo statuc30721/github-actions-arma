@@ -176,7 +176,7 @@ resource "aws_rds_cluster" "pii_db_cluster" {
   # Recommend adding a password variable or manually putting a password in 
   # this field before deploying the database cluster.
 
-  master_password = "mybadpassword"
+  master_password = ""
 
   # Create a random password. 
   # create_random_password = true
