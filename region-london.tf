@@ -1,13 +1,13 @@
 # VPC
 resource "aws_vpc" "VPC-C-London-Test" {
-    provider = aws.london
+  provider   = aws.london
   cidr_block = "10.22.0.0/16"
 
   tags = {
-    Name = "VPC-C-London-Test"
+    Name    = "VPC-C-London-Test"
     Service = "application1"
-    Owner = "Frodo"
-    Planet = "Arda"
+    Owner   = "Frodo"
+    Planet  = "Arda"
   }
 }
 
@@ -17,18 +17,18 @@ resource "aws_vpc" "VPC-C-London-Test" {
 
 
 resource "aws_subnet" "public-eu-west-2a" {
-    vpc_id                  = aws_vpc.VPC-C-London-Test.id
-    cidr_block              = "10.22.1.0/24"
-    availability_zone       = "eu-west-2a"
-    map_public_ip_on_launch = true
-    provider = aws.london
+  vpc_id                  = aws_vpc.VPC-C-London-Test.id
+  cidr_block              = "10.22.1.0/24"
+  availability_zone       = "eu-west-2a"
+  map_public_ip_on_launch = true
+  provider                = aws.london
 
-    tags = {
+  tags = {
     Name    = "public-eu-west-2a"
     Service = "application1"
     Owner   = "Frodo"
     Planet  = "Arda"
-    }
+  }
 }
 
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "public-eu-west-2b" {
   cidr_block              = "10.22.2.0/24"
   availability_zone       = "eu-west-2b"
   map_public_ip_on_launch = true
-  provider = aws.london
+  provider                = aws.london
 
   tags = {
     Name    = "public-eu-west-2b"
@@ -50,11 +50,11 @@ resource "aws_subnet" "public-eu-west-2b" {
 # london Private IP space.
 
 resource "aws_subnet" "private-eu-west-2a" {
-  vpc_id                  = aws_vpc.VPC-C-London-Test.id
-  cidr_block              = "10.22.11.0/24"
-  availability_zone       = "eu-west-2a"
-  provider = aws.london
-  
+  vpc_id            = aws_vpc.VPC-C-London-Test.id
+  cidr_block        = "10.22.11.0/24"
+  availability_zone = "eu-west-2a"
+  provider          = aws.london
+
   tags = {
     Name    = "private-eu-west-2a"
     Service = "application1"
@@ -64,10 +64,10 @@ resource "aws_subnet" "private-eu-west-2a" {
 }
 
 resource "aws_subnet" "private-eu-west-2b" {
-  vpc_id                  = aws_vpc.VPC-C-London-Test.id
-  cidr_block              = "10.22.12.0/24"
-  availability_zone       = "eu-west-2b"
-  provider = aws.london
+  vpc_id            = aws_vpc.VPC-C-London-Test.id
+  cidr_block        = "10.22.12.0/24"
+  availability_zone = "eu-west-2b"
+  provider          = aws.london
 
   tags = {
     Name    = "private-eu-west-2b"
@@ -80,7 +80,7 @@ resource "aws_subnet" "private-eu-west-2b" {
 
 # IGW
 resource "aws_internet_gateway" "igw_LON" {
-  vpc_id = aws_vpc.VPC-C-London-Test.id
+  vpc_id   = aws_vpc.VPC-C-London-Test.id
   provider = aws.london
 
 
@@ -97,7 +97,7 @@ resource "aws_internet_gateway" "igw_LON" {
 # NAT
 
 resource "aws_eip" "eip_LONDON" {
-  vpc = true
+  vpc      = true
   provider = aws.london
 
   tags = {
@@ -109,7 +109,7 @@ resource "aws_eip" "eip_LONDON" {
 resource "aws_nat_gateway" "nat_LONDON" {
   allocation_id = aws_eip.eip_LONDON.id
   subnet_id     = aws_subnet.public-eu-west-2a.id
-  provider = aws.london
+  provider      = aws.london
 
   tags = {
     Name = "nat_LONDON"
@@ -125,10 +125,11 @@ resource "aws_nat_gateway" "nat_LONDON" {
 # Public Network
 
 resource "aws_route_table" "public_London" {
-  vpc_id = aws_vpc.VPC-C-London-Test.id
+  vpc_id   = aws_vpc.VPC-C-London-Test.id
   provider = aws.london
 
-  route   {
+  route = [
+    {
       cidr_block                 = "0.0.0.0/0"
       gateway_id                 = aws_internet_gateway.igw_LON.id
       nat_gateway_id             = ""
@@ -142,9 +143,10 @@ resource "aws_route_table" "public_London" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
-  
-    tags = {
+    },
+  ]
+
+  tags = {
     Name = "public_london"
   }
 }
@@ -156,13 +158,13 @@ resource "aws_route_table" "public_London" {
 resource "aws_route_table_association" "public-eu-west-2a" {
   subnet_id      = aws_subnet.public-eu-west-2a.id
   route_table_id = aws_route_table.public_London.id
-  provider = aws.london
+  provider       = aws.london
 }
 
 resource "aws_route_table_association" "public-eu-west-2b" {
   subnet_id      = aws_subnet.public-eu-west-2b.id
   route_table_id = aws_route_table.public_London.id
-  provider = aws.london
+  provider       = aws.london
 }
 
 #-----------------------------------------------#
@@ -170,11 +172,12 @@ resource "aws_route_table_association" "public-eu-west-2b" {
 
 
 resource "aws_route_table" "private_London" {
-  vpc_id = aws_vpc.VPC-C-London-Test.id
+  vpc_id   = aws_vpc.VPC-C-London-Test.id
   provider = aws.london
-  
-  
-  route  {
+
+
+  route = [
+    {
       cidr_block                 = "0.0.0.0/0"
       nat_gateway_id             = aws_nat_gateway.nat_LONDON.id
       carrier_gateway_id         = ""
@@ -186,12 +189,12 @@ resource "aws_route_table" "private_London" {
       local_gateway_id           = ""
       network_interface_id       = ""
       transit_gateway_id         = ""
-      vpc_endpoint_id            = "" 
+      vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
+    },
 
-# This route is to pass traffic to Tokyo Security Zone VPC.
-route  {
+    # This route is to pass traffic to Tokyo Security Zone VPC.
+    {
       cidr_block                 = "10.0.0.0/8"
       nat_gateway_id             = ""
       carrier_gateway_id         = ""
@@ -205,7 +208,8 @@ route  {
       transit_gateway_id         = aws_ec2_transit_gateway.VPC-C-London-Test-TGW01.id
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
+    },
+  ]
 
   tags = {
     Name = "private_london"
@@ -218,13 +222,13 @@ route  {
 resource "aws_route_table_association" "private-eu-west-2a" {
   subnet_id      = aws_subnet.private-eu-west-2a.id
   route_table_id = aws_route_table.private_London.id
-  provider = aws.london
+  provider       = aws.london
 }
 
 resource "aws_route_table_association" "private-eu-west-2b" {
   subnet_id      = aws_subnet.private-eu-west-2b.id
   route_table_id = aws_route_table.private_London.id
-  provider = aws.london
+  provider       = aws.london
 }
 
 
@@ -234,101 +238,101 @@ resource "aws_route_table_association" "private-eu-west-2b" {
 # Security group for Load Balancer
 
 resource "aws_security_group" "ASG01-SG01-LONDON-LB01" {
-    name = "ASG01-SG01-LONDON-LB01"
-    description = "Allow HTTP inbound traffic to Load Balancer."
-    vpc_id = aws_vpc.VPC-C-London-Test.id
-    provider = aws.london
+  name        = "ASG01-SG01-LONDON-LB01"
+  description = "Allow HTTP inbound traffic to Load Balancer."
+  vpc_id      = aws_vpc.VPC-C-London-Test.id
+  provider    = aws.london
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-   egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-    tags = {
-        Name = "ASG01-SG01-LONDON-LB01"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name    = "ASG01-SG01-LONDON-LB01"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security Group for Automatic Scaling Group
 resource "aws_security_group" "ASG01-SG02-LONDON-TG80" {
-    name = "ASG01-SG02-LONDON-TG80"
-    description = "allow traffic to ASG"
-    vpc_id = aws_vpc.VPC-C-London-Test.id
-    provider = aws.london
+  name        = "ASG01-SG02-LONDON-TG80"
+  description = "allow traffic to ASG"
+  vpc_id      = aws_vpc.VPC-C-London-Test.id
+  provider    = aws.london
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-      tags = {
-        Name = "ASG01-SG02-LONDON-TG80"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG02-LONDON-TG80"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security group for EC2 Virtual Machines
 resource "aws_security_group" "ASG01-SG03-LONDON-servers" {
-    name = "ASG01-SG03-LONDON-servers"
-    description = "Allow SSH and HTTP traffic to production servers"
-    vpc_id = aws_vpc.VPC-C-London-Test.id
-    provider = aws.london
+  name        = "ASG01-SG03-LONDON-servers"
+  description = "Allow SSH and HTTP traffic to production servers"
+  vpc_id      = aws_vpc.VPC-C-London-Test.id
+  provider    = aws.london
 
-    ingress {
-        description = "SSH"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr_blocks = ["10.0.0.0/8"]
-    }
-
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
-    tags = {
-        Name = "ASG01-SG03-LONDON-servers"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG03-LONDON-servers"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
@@ -337,12 +341,12 @@ resource "aws_security_group" "ASG01-SG03-LONDON-servers" {
 # Target Groups
 
 resource "aws_lb_target_group" "ASG01_LON_TG01" {
-  name     = "ASG01-London-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.VPC-C-London-Test.id
+  name        = "ASG01-London-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.VPC-C-London-Test.id
   target_type = "instance"
-  provider = aws.london
+  provider    = aws.london
 
   health_check {
     enabled             = true
@@ -373,7 +377,7 @@ resource "aws_lb" "ASG01-LON-LB01" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ASG01-SG01-LONDON-LB01.id]
-  subnets            = [
+  subnets = [
     aws_subnet.public-eu-west-2a.id,
     aws_subnet.public-eu-west-2b.id
   ]
@@ -381,7 +385,7 @@ resource "aws_lb" "ASG01-LON-LB01" {
   provider = aws.london
 
   enable_deletion_protection = false
-#Lots of death and suffering here, make sure it's false
+  #Lots of death and suffering here, make sure it's false
 
   tags = {
     Name    = "ASG01-LON-LB01"
@@ -408,21 +412,21 @@ resource "aws_lb_listener" "http_LON" {
 # ASG
 
 resource "aws_autoscaling_group" "ASG01_LON" {
-  name_prefix           = "ASG01-London-auto-scaling-group"
-  min_size              = 1
-  max_size              = 5
-  desired_capacity      = 2
-  vpc_zone_identifier   = [
+  name_prefix      = "ASG01-London-auto-scaling-group"
+  min_size         = 1
+  max_size         = 5
+  desired_capacity = 2
+  vpc_zone_identifier = [
     aws_subnet.private-eu-west-2a.id,
     aws_subnet.private-eu-west-2b.id
   ]
 
   provider = aws.london
-  
-  health_check_type          = "ELB"
-  health_check_grace_period  = 300
-  force_delete               = true
-  target_group_arns          = [aws_lb_target_group.ASG01_LON_TG01.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
+  force_delete              = true
+  target_group_arns         = [aws_lb_target_group.ASG01_LON_TG01.arn]
 
   launch_template {
     id      = aws_launch_template.app1_London_LT.id
@@ -442,10 +446,10 @@ resource "aws_autoscaling_group" "ASG01_LON" {
 
   # Instance protection for terminating
   initial_lifecycle_hook {
-    name                  = "scale-in-protection"
-    lifecycle_transition  = "autoscaling:EC2_INSTANCE_TERMINATING"
-    default_result        = "CONTINUE"
-    heartbeat_timeout     = 300
+    name                 = "scale-in-protection"
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 300
   }
 
   tag {
@@ -467,7 +471,7 @@ resource "aws_autoscaling_policy" "app1_LON_scaling_policy" {
   name                   = "app1-cpu-target"
   autoscaling_group_name = aws_autoscaling_group.ASG01_LON.name
 
-  policy_type = "TargetTrackingScaling"
+  policy_type               = "TargetTrackingScaling"
   estimated_instance_warmup = 120
 
   provider = aws.london
@@ -484,6 +488,6 @@ resource "aws_autoscaling_policy" "app1_LON_scaling_policy" {
 resource "aws_autoscaling_attachment" "ASG01_LON_attachment" {
   autoscaling_group_name = aws_autoscaling_group.ASG01_LON.name
   alb_target_group_arn   = aws_lb_target_group.ASG01_LON_TG01.arn
-  provider = aws.london
+  provider               = aws.london
 
 }

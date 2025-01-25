@@ -1,13 +1,13 @@
 # VPC
 resource "aws_vpc" "VPC-G-California-Test" {
-    provider = aws.california
-    cidr_block = "10.26.0.0/16"
+  provider   = aws.california
+  cidr_block = "10.26.0.0/16"
 
   tags = {
-    Name = "VPC-G-California-Test"
+    Name    = "VPC-G-California-Test"
     Service = "application1"
-    Owner = "Frodo"
-    Planet = "Arda"
+    Owner   = "Frodo"
+    Planet  = "Arda"
   }
 }
 
@@ -22,7 +22,7 @@ resource "aws_subnet" "public-us-west-1a" {
   cidr_block              = "10.26.1.0/24"
   availability_zone       = "us-west-1a"
   map_public_ip_on_launch = true
-  provider = aws.california
+  provider                = aws.california
 
   tags = {
     Name    = "public-us-west-1a"
@@ -37,7 +37,7 @@ resource "aws_subnet" "public-us-west-1b" {
   cidr_block              = "10.26.2.0/24"
   availability_zone       = "us-west-1b"
   map_public_ip_on_launch = true
-  provider = aws.california
+  provider                = aws.california
 
   tags = {
     Name    = "public-us-west-1b"
@@ -50,10 +50,10 @@ resource "aws_subnet" "public-us-west-1b" {
 # California Private IP space.
 
 resource "aws_subnet" "private-us-west-1a" {
-  vpc_id                  = aws_vpc.VPC-G-California-Test.id
-  cidr_block              = "10.26.11.0/24"
-  availability_zone       = "us-west-1a"
-  provider = aws.california
+  vpc_id            = aws_vpc.VPC-G-California-Test.id
+  cidr_block        = "10.26.11.0/24"
+  availability_zone = "us-west-1a"
+  provider          = aws.california
 
 
   tags = {
@@ -65,10 +65,10 @@ resource "aws_subnet" "private-us-west-1a" {
 }
 
 resource "aws_subnet" "private-us-west-1b" {
-  vpc_id                  = aws_vpc.VPC-G-California-Test.id
-  cidr_block              = "10.26.12.0/24"
-  availability_zone       = "us-west-1b"
-  provider = aws.california
+  vpc_id            = aws_vpc.VPC-G-California-Test.id
+  cidr_block        = "10.26.12.0/24"
+  availability_zone = "us-west-1b"
+  provider          = aws.california
 
 
   tags = {
@@ -82,7 +82,7 @@ resource "aws_subnet" "private-us-west-1b" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw_CALI" {
-  vpc_id = aws_vpc.VPC-G-California-Test.id
+  vpc_id   = aws_vpc.VPC-G-California-Test.id
   provider = aws.california
 
 
@@ -98,7 +98,7 @@ resource "aws_internet_gateway" "igw_CALI" {
 #---------------------------------------------------#
 # NAT
 resource "aws_eip" "eip_California" {
-  vpc = true
+  vpc      = true
   provider = aws.california
 
   tags = {
@@ -110,7 +110,7 @@ resource "aws_eip" "eip_California" {
 resource "aws_nat_gateway" "nat_California" {
   allocation_id = aws_eip.eip_California.id
   subnet_id     = aws_subnet.public-us-west-1a.id
-  provider = aws.california
+  provider      = aws.california
 
   tags = {
     Name = "nat_California"
@@ -126,10 +126,11 @@ resource "aws_nat_gateway" "nat_California" {
 # Public Network
 
 resource "aws_route_table" "public_California" {
-  vpc_id = aws_vpc.VPC-G-California-Test.id
+  vpc_id   = aws_vpc.VPC-G-California-Test.id
   provider = aws.california
 
-  route   {
+  route = [
+    {
       cidr_block                 = "0.0.0.0/0"
       gateway_id                 = aws_internet_gateway.igw_CALI.id
       nat_gateway_id             = ""
@@ -143,9 +144,10 @@ resource "aws_route_table" "public_California" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
-  
-    tags = {
+    },
+  ]
+
+  tags = {
     Name = "public_California"
   }
 }
@@ -157,13 +159,13 @@ resource "aws_route_table" "public_California" {
 resource "aws_route_table_association" "public-us-west-1a" {
   subnet_id      = aws_subnet.public-us-west-1a.id
   route_table_id = aws_route_table.public_California.id
-  provider = aws.california
+  provider       = aws.california
 }
 
 resource "aws_route_table_association" "public-us-west-1b" {
   subnet_id      = aws_subnet.public-us-west-1b.id
   route_table_id = aws_route_table.public_California.id
-  provider = aws.california
+  provider       = aws.california
 }
 
 #-----------------------------------------------#
@@ -172,11 +174,12 @@ resource "aws_route_table_association" "public-us-west-1b" {
 
 
 resource "aws_route_table" "private_California" {
-  vpc_id = aws_vpc.VPC-G-California-Test.id
+  vpc_id   = aws_vpc.VPC-G-California-Test.id
   provider = aws.california
-  
-  
-  route  {
+
+
+  route = [
+    {
       cidr_block                 = "0.0.0.0/0"
       nat_gateway_id             = aws_nat_gateway.nat_California.id
       carrier_gateway_id         = ""
@@ -190,10 +193,10 @@ resource "aws_route_table" "private_California" {
       transit_gateway_id         = ""
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
+    },
 
-# This route is to pass traffic to Tokyo Security Zone VPC.
-route  {
+    # This route is to pass traffic to Tokyo Security Zone VPC.
+    {
       cidr_block                 = "10.0.0.0/8"
       nat_gateway_id             = ""
       carrier_gateway_id         = ""
@@ -207,7 +210,8 @@ route  {
       transit_gateway_id         = aws_ec2_transit_gateway.VPC-G-California-TGW01.id
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
-    }
+    },
+  ]
 
   tags = {
     Name = "private_California"
@@ -220,13 +224,13 @@ route  {
 resource "aws_route_table_association" "private-us-west-1a" {
   subnet_id      = aws_subnet.private-us-west-1a.id
   route_table_id = aws_route_table.private_California.id
-  provider = aws.california
+  provider       = aws.california
 }
 
 resource "aws_route_table_association" "private-us-west-1b" {
   subnet_id      = aws_subnet.private-us-west-1b.id
   route_table_id = aws_route_table.private_California.id
-  provider = aws.california
+  provider       = aws.california
 }
 
 
@@ -234,102 +238,102 @@ resource "aws_route_table_association" "private-us-west-1b" {
 # Security group for Load Balancer
 
 resource "aws_security_group" "ASG01-SG01-CALI-LB01" {
-    name = "ASG01-SG01-CALI-LB01"
-    description = "Allow HTTP inbound traffic to Load Balancer."
-    vpc_id = aws_vpc.VPC-G-California-Test.id
-    provider = aws.california
+  name        = "ASG01-SG01-CALI-LB01"
+  description = "Allow HTTP inbound traffic to Load Balancer."
+  vpc_id      = aws_vpc.VPC-G-California-Test.id
+  provider    = aws.california
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-   egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-    tags = {
-        Name = "ASG01-SG01-CALI-LB01"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name    = "ASG01-SG01-CALI-LB01"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security Group for Automatic Scaling Group
 resource "aws_security_group" "ASG01-SG02-CALI-TG80" {
-    name = "ASG01-SG02-CALI-TG80"
-    description = "allow traffic to ASG"
-    vpc_id = aws_vpc.VPC-G-California-Test.id
-    provider = aws.california
+  name        = "ASG01-SG02-CALI-TG80"
+  description = "allow traffic to ASG"
+  vpc_id      = aws_vpc.VPC-G-California-Test.id
+  provider    = aws.california
 
 
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-      tags = {
-        Name = "ASG01-SG02-CALI-TG80"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG02-CALI-TG80"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
 # Security group for EC2 Virtual Machines
 resource "aws_security_group" "ASG01-SG03-CALI-servers" {
-    name = "ASG01-SG03-CALI-servers"
-    description = "Allow SSH and HTTP traffic to production servers"
-    vpc_id = aws_vpc.VPC-G-California-Test.id
-    provider = aws.california
+  name        = "ASG01-SG03-CALI-servers"
+  description = "Allow SSH and HTTP traffic to production servers"
+  vpc_id      = aws_vpc.VPC-G-California-Test.id
+  provider    = aws.california
 
-    ingress {
-        description = "SSH"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr_blocks = ["10.0.0.0/8"]
-    }
-
-    ingress {
-        description = "HTTP"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/8"]
   }
 
-    tags = {
-        Name = "ASG01-SG03-CALI-servers"
-        Service = "application1"
-        Owner = "Frodo"
-        Planet = "Arda"
-    }
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name    = "ASG01-SG03-CALI-servers"
+    Service = "application1"
+    Owner   = "Frodo"
+    Planet  = "Arda"
+  }
 }
 
 
@@ -337,12 +341,12 @@ resource "aws_security_group" "ASG01-SG03-CALI-servers" {
 # Target Groups
 
 resource "aws_lb_target_group" "ASG01_CALI_TG01" {
-  name     = "ASG01-California-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.VPC-G-California-Test.id
+  name        = "ASG01-California-target-group"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.VPC-G-California-Test.id
   target_type = "instance"
-  provider = aws.california
+  provider    = aws.california
 
   health_check {
     enabled             = true
@@ -371,7 +375,7 @@ resource "aws_lb" "ASG01-CALI-LB01" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ASG01-SG01-CALI-LB01.id]
-  subnets            = [
+  subnets = [
     aws_subnet.public-us-west-1a.id,
     aws_subnet.public-us-west-1b.id
   ]
@@ -379,7 +383,7 @@ resource "aws_lb" "ASG01-CALI-LB01" {
   provider = aws.california
 
   enable_deletion_protection = false
-#Lots of death and suffering here, make sure it's false
+  #Lots of death and suffering here, make sure it's false
 
   tags = {
     Name    = "ASG01-CALI-LB01"
@@ -406,21 +410,21 @@ resource "aws_lb_listener" "http_CALI" {
 # Auto Scaling Group
 
 resource "aws_autoscaling_group" "ASG01_CALI" {
-  name_prefix           = "ASG01-California-auto-scaling-group"
-  min_size              = 1
-  max_size              = 5
-  desired_capacity      = 2
-  vpc_zone_identifier   = [
+  name_prefix      = "ASG01-California-auto-scaling-group"
+  min_size         = 1
+  max_size         = 5
+  desired_capacity = 2
+  vpc_zone_identifier = [
     aws_subnet.private-us-west-1a.id,
     aws_subnet.private-us-west-1b.id
   ]
 
   provider = aws.california
-  
-  health_check_type          = "ELB"
-  health_check_grace_period  = 300
-  force_delete               = true
-  target_group_arns          = [aws_lb_target_group.ASG01_CALI_TG01.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
+  force_delete              = true
+  target_group_arns         = [aws_lb_target_group.ASG01_CALI_TG01.arn]
 
   launch_template {
     id      = aws_launch_template.app1_California_LT.id
@@ -440,10 +444,10 @@ resource "aws_autoscaling_group" "ASG01_CALI" {
 
   # Instance protection for terminating
   initial_lifecycle_hook {
-    name                  = "scale-in-protection"
-    lifecycle_transition  = "autoscaling:EC2_INSTANCE_TERMINATING"
-    default_result        = "CONTINUE"
-    heartbeat_timeout     = 300
+    name                 = "scale-in-protection"
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_TERMINATING"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 300
   }
 
   tag {
@@ -465,7 +469,7 @@ resource "aws_autoscaling_policy" "app1_CALI_scaling_policy" {
   name                   = "app1-cpu-target"
   autoscaling_group_name = aws_autoscaling_group.ASG01_CALI.name
 
-  policy_type = "TargetTrackingScaling"
+  policy_type               = "TargetTrackingScaling"
   estimated_instance_warmup = 120
 
   provider = aws.california
@@ -482,6 +486,6 @@ resource "aws_autoscaling_policy" "app1_CALI_scaling_policy" {
 resource "aws_autoscaling_attachment" "ASG01_CALI_attachment" {
   autoscaling_group_name = aws_autoscaling_group.ASG01_CALI.name
   alb_target_group_arn   = aws_lb_target_group.ASG01_CALI_TG01.arn
-  provider = aws.california
+  provider               = aws.california
 }
 
