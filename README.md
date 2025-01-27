@@ -1,1 +1,1 @@
-Create multi-region VPC with at least 2 AZ with ASG, HTTP. Levereages terraform and AWS templates. 
+Create multi-region VPC with at least 2 AZ with ASG, HTTP. Levereages terraform enterprise and AWS templates.
