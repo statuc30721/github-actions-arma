@@ -127,7 +127,7 @@ resource "aws_nat_gateway" "nat_NY" {
 resource "aws_route_table" "private_NY" {
   vpc_id = aws_vpc.VPC-B-NewYork-Test.id
 
-  /*
+  
   route  {
       cidr_block                 = "10.19.0.0/16"
       nat_gateway_id             = ""
@@ -143,7 +143,7 @@ resource "aws_route_table" "private_NY" {
       vpc_endpoint_id            = ""
       vpc_peering_connection_id  = ""
     }
-    */
+    
 
 
   route {
